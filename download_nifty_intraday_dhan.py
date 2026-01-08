@@ -33,7 +33,7 @@ dhan_access_token = dhan_access_token.strip()
 DHAN_API_BASE = "https://api.dhan.co"
 DHAN_INTRADAY_ENDPOINT = f"{DHAN_API_BASE}/v2/charts/intraday"
 
-# NIFTY 50 index configuration (same as used in daily spot script)
+# NIFTY SECURITY ID: 13, INDIA_VIX SECURITY ID: 21
 NIFTY_SECURITY_ID = "13"
 EXCHANGE_SEGMENT = "IDX_I"  # Index derivatives segment
 INSTRUMENT_TYPE = "INDEX"
