@@ -34,7 +34,7 @@ DHAN_API_BASE = "https://api.dhan.co"
 DHAN_INTRADAY_ENDPOINT = f"{DHAN_API_BASE}/v2/charts/intraday"
 
 # NIFTY SECURITY ID: 13, INDIA_VIX SECURITY ID: 21
-NIFTY_SECURITY_ID = "13"
+NIFTY_SECURITY_ID = "21"
 EXCHANGE_SEGMENT = "IDX_I"  # Index derivatives segment
 INSTRUMENT_TYPE = "INDEX"
 
@@ -202,8 +202,8 @@ def fetch_nifty_intraday_close_dhan(start_date: datetime, end_date: datetime):
 
 def main():
     # Fixed date range: 2023-01-01 to 2025-12-31
-    start_date = datetime(2023, 1, 1)
-    end_date = datetime(2025, 12, 31)
+    start_date = datetime(2026, 1, 1)
+    end_date = datetime(2026, 1, 22)
 
     output_file = "nifty_intraday_price.json"
 

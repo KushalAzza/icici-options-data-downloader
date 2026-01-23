@@ -1,6 +1,6 @@
 """
 Download NIFTY spot prices using Dhan REST API
-Date range: Jan 1, 2025 to Dec 31, 2025
+Date range is configured via START_DATE and END_DATE in .env file
 
 Documentation: https://dhanhq.co/docs/v2/historical-data/
 """
@@ -19,11 +19,31 @@ load_dotenv(override=True)
 dhan_access_token = os.getenv('DHAN_ACCESS_TOKEN')
 dhan_client_id = os.getenv('DHAN_CLIENT_ID')
 
+# Get date range from .env file
+start_date_str = os.getenv('START_DATE')
+end_date_str = os.getenv('END_DATE')
+
 if not dhan_access_token:
     raise ValueError("DHAN_ACCESS_TOKEN must be set in .env file")
 
+if not start_date_str or not end_date_str:
+    raise ValueError("START_DATE and END_DATE must be set in .env file (format: YYYY-MM-DD)")
+
 # Strip any whitespace from token (common issue)
 dhan_access_token = dhan_access_token.strip()
+start_date_str = start_date_str.strip()
+end_date_str = end_date_str.strip()
+
+# Parse dates
+try:
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+    end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+except ValueError as e:
+    raise ValueError(f"Invalid date format in .env file. Use YYYY-MM-DD format. Error: {e}")
+
+# Validate dates
+if start_date > end_date:
+    raise ValueError("START_DATE must be before or equal to END_DATE")
 
 # Dhan API configuration
 DHAN_API_BASE = "https://api.dhan.co"
@@ -160,10 +180,7 @@ def fetch_nifty_spot_prices_dhan(start_date, end_date):
     return spot_prices
 
 def main():
-    # Date range: Jan 1, 2023 to Dec 31, 2025
-    start_date = datetime(2023, 1, 1)
-    end_date = datetime(2025, 12, 31)
-    
+    # Dates are already parsed from .env file at module level
     print(f"Downloading NIFTY spot prices from {start_date.date()} to {end_date.date()}")
     
     # Fetch spot prices
