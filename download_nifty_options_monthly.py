@@ -28,6 +28,11 @@ from collections import defaultdict
 # Load environment variables
 load_dotenv()
 
+# Data/output configuration
+DATA_DIR = "data"
+OPTIONS_DIR = os.path.join(DATA_DIR, "options")
+os.makedirs(OPTIONS_DIR, exist_ok=True)
+
 # Get credentials from environment variables
 api_key = os.getenv('ICICI_API_KEY')
 api_secret = os.getenv('ICICI_SECRET_KEY')
@@ -44,7 +49,7 @@ breeze = BreezeConnect(api_key=api_key)
 print("Generating session...")
 breeze.generate_session(api_secret=api_secret, session_token=session_token)
 
-def load_spot_prices_from_file(file_path='nifty_spot_prices.json'):
+def load_spot_prices_from_file(file_path=os.path.join(DATA_DIR, 'nifty_spot_prices.json')):
     """Load NIFTY spot prices from JSON file"""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -162,7 +167,7 @@ def check_expiry_has_data(breeze, date_str, expiry_date_iso, sample_strike):
 
 def save_daily_data(date_str, day_data, spot_price, expiry_date_str):
     """Save data for a single day to a separate file"""
-    output_file = f"nifty_options_{date_str}.json"
+    output_file = os.path.join(OPTIONS_DIR, f"nifty_options_{date_str}.json")
     
     output_data = {
         'date': date_str,
@@ -178,7 +183,7 @@ def save_daily_data(date_str, day_data, spot_price, expiry_date_str):
 
 def save_next_expiry_data(date_str, day_data, spot_price, expiry_date_str):
     """Save next expiry data to a separate file with _next_expiry suffix"""
-    output_file = f"nifty_options_{date_str}_next_expiry.json"
+    output_file = os.path.join(OPTIONS_DIR, f"nifty_options_{date_str}_next_expiry.json")
     
     output_data = {
         'date': date_str,

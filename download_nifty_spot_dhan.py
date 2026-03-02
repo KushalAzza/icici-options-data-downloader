@@ -23,16 +23,23 @@ dhan_client_id = os.getenv('DHAN_CLIENT_ID')
 start_date_str = os.getenv('START_DATE')
 end_date_str = os.getenv('END_DATE')
 
+# Get security id from .env file (instrument to download)
+use_security_id = os.getenv('USE_SECURITY_ID')
+
 if not dhan_access_token:
     raise ValueError("DHAN_ACCESS_TOKEN must be set in .env file")
 
 if not start_date_str or not end_date_str:
     raise ValueError("START_DATE and END_DATE must be set in .env file (format: YYYY-MM-DD)")
 
-# Strip any whitespace from token (common issue)
+if not use_security_id:
+    raise ValueError("USE_SECURITY_ID must be set in .env file (Dhan securityId for the index, e.g. 13 for NIFTY, 21 for India VIX)")
+
+# Strip any whitespace from token / inputs (common issue)
 dhan_access_token = dhan_access_token.strip()
 start_date_str = start_date_str.strip()
 end_date_str = end_date_str.strip()
+use_security_id = use_security_id.strip()
 
 # Parse dates
 try:
@@ -49,8 +56,11 @@ if start_date > end_date:
 DHAN_API_BASE = "https://api.dhan.co"
 DHAN_HISTORICAL_ENDPOINT = f"{DHAN_API_BASE}/v2/charts/historical"
 
-# NIFTY 50 security ID
-NIFTY_SECURITY_ID = "13"
+# Data/output configuration
+DATA_DIR = "data"
+
+# Security ID (instrument) from environment
+SECURITY_ID = use_security_id
 
 def fetch_nifty_spot_prices_dhan(start_date, end_date):
     """Fetch NIFTY spot prices from Dhan REST API for the given date range"""
@@ -96,7 +106,7 @@ def fetch_nifty_spot_prices_dhan(start_date, end_date):
             end_date_inclusive = (chunk_end + timedelta(days=1)).strftime("%Y-%m-%d")
             
             payload = {
-                "securityId": NIFTY_SECURITY_ID,
+                "securityId": SECURITY_ID,
                 "exchangeSegment": "IDX_I",
                 "instrument": "INDEX",
                 "expiryCode": 0,
@@ -193,7 +203,9 @@ def main():
     print(f"\n✓ Successfully downloaded {len(spot_prices)} spot price records")
     
     # Save to file in the same format as existing nifty_spot_prices.json
-    output_file = 'nifty_spot_prices.json'
+    # Ensure data directory exists
+    os.makedirs(DATA_DIR, exist_ok=True)
+    output_file = os.path.join(DATA_DIR, 'nifty_spot_prices.json')
     output_data = {
         'date_range': {
             'start': start_date.strftime("%Y-%m-%d"),

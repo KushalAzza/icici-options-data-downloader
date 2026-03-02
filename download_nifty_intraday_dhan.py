@@ -22,19 +22,30 @@ load_dotenv(override=True)
 dhan_access_token = os.getenv("DHAN_ACCESS_TOKEN")
 dhan_client_id = os.getenv("DHAN_CLIENT_ID")
 
+# Get security id from .env file (instrument to download)
+use_security_id = os.getenv("USE_SECURITY_ID")
+
 if not dhan_access_token:
     raise ValueError("DHAN_ACCESS_TOKEN must be set in .env file")
 
-# Strip any whitespace from token (common issue)
+if not use_security_id:
+    raise ValueError("USE_SECURITY_ID must be set in .env file (Dhan securityId for the index, e.g. 13 for NIFTY, 21 for India VIX)")
+
+# Strip any whitespace from token / inputs (common issue)
 dhan_access_token = dhan_access_token.strip()
+use_security_id = use_security_id.strip()
 
 # Dhan API configuration (intraday historical data)
 # Reference: https://dhanhq.co/docs/v2/historical-data/#intraday-historical-data
 DHAN_API_BASE = "https://api.dhan.co"
 DHAN_INTRADAY_ENDPOINT = f"{DHAN_API_BASE}/v2/charts/intraday"
 
-# NIFTY SECURITY ID: 13, INDIA_VIX SECURITY ID: 21
-NIFTY_SECURITY_ID = "21"
+# Data/output configuration
+DATA_DIR = "data"
+
+# Security ID (instrument) from environment
+# Common values: NIFTY=13, India VIX=21
+SECURITY_ID = use_security_id
 EXCHANGE_SEGMENT = "IDX_I"  # Index derivatives segment
 INSTRUMENT_TYPE = "INDEX"
 
@@ -103,7 +114,7 @@ def fetch_nifty_intraday_close_dhan(start_date: datetime, end_date: datetime):
         )
 
         payload = {
-            "securityId": NIFTY_SECURITY_ID,
+            "securityId": SECURITY_ID,
             "exchangeSegment": EXCHANGE_SEGMENT,
             "instrument": INSTRUMENT_TYPE,
             "interval": INTERVAL,  # 1-minute candles
@@ -205,7 +216,9 @@ def main():
     start_date = datetime(2026, 1, 1)
     end_date = datetime(2026, 1, 22)
 
-    output_file = "nifty_intraday_price.json"
+    # Ensure data directory exists
+    os.makedirs(DATA_DIR, exist_ok=True)
+    output_file = os.path.join(DATA_DIR, "nifty_intraday_price.json")
 
     per_day_data = fetch_nifty_intraday_close_dhan(start_date, end_date)
 
