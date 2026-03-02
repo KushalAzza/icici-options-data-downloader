@@ -235,7 +235,8 @@ def main():
     print("Step 1: Loading NIFTY spot prices from file...")
     print(f"{'='*80}\n")
     
-    spot_prices = load_spot_prices_from_file('nifty_spot_prices.json')
+    # Load spot prices from data/nifty_spot_prices.json (default path)
+    spot_prices = load_spot_prices_from_file()
     
     if not spot_prices:
         print("✗ Failed to load spot prices. Exiting.")
