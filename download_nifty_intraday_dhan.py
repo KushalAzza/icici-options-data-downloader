@@ -1,10 +1,9 @@
 """
-Download NIFTY 1-minute close prices using Dhan Intraday Historical Data API.
+Download NIFTY 1-minute OHLC using Dhan Intraday Historical Data API.
 
-Date range: 2023-01-01 to 2025-12-31
-Source: Dhan /charts/intraday endpoint (Intraday Historical Data) [1]
+Date range is configured via START_DATE and END_DATE in .env.
 
-[1]: https://dhanhq.co/docs/v2/historical-data/#intraday-historical-data
+Documentation: https://dhanhq.co/docs/v2/historical-data/#intraday-historical-data
 """
 
 import os
@@ -212,9 +211,25 @@ def fetch_nifty_intraday_close_dhan(start_date: datetime, end_date: datetime):
 
 
 def main():
-    # Fixed date range: 2023-01-01 to 2025-12-31
-    start_date = datetime(2026, 1, 1)
-    end_date = datetime(2026, 1, 22)
+    start_date_str = os.getenv("START_DATE")
+    end_date_str = os.getenv("END_DATE")
+
+    if not start_date_str or not end_date_str:
+        raise ValueError("START_DATE and END_DATE must be set in .env file (format: YYYY-MM-DD)")
+
+    start_date_str = start_date_str.strip()
+    end_date_str = end_date_str.strip()
+
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+    except ValueError as e:
+        raise ValueError(f"Invalid date format in .env file. Use YYYY-MM-DD format. Error: {e}")
+
+    if start_date > end_date:
+        raise ValueError("START_DATE must be before or equal to END_DATE")
+
+    print(f"Downloading NIFTY 1-minute intraday data from {start_date.date()} to {end_date.date()}")
 
     # Ensure data directory exists
     os.makedirs(DATA_DIR, exist_ok=True)
