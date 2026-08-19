@@ -2,7 +2,7 @@
 
 Python scripts that download NIFTY index and options data from [Dhan](https://dhan.co) and [ICICI Direct Breeze](https://www.icicidirect.com/).
 
-Generated JSON is written under `data/` and is not in git.
+Use the output with **[backtest-trade](https://github.com/KushalAzza/backtest-trade)** to backtest Nifty options strategies. Generated JSON is written under `data/` and is not in git.
 
 ```
 icici-options-data-downloader/
@@ -84,6 +84,8 @@ python download_nifty_intraday_dhan.py
 Monthly options: for each trading day, 20 strikes above and 20 below the spot (multiples of 50), CALL and PUT, 1-minute bars from 09:15 to 15:30 IST. Days with no spot price are treated as holidays.
 
 The scripts pause between requests (Dhan about 10/sec, Breeze about 100/min).
+
+To backtest this data, copy the JSON into **[backtest-trade](https://github.com/KushalAzza/backtest-trade)** as `data/nifty_intraday_price.json` and `data/YYYY/nifty_options_YYYY-MM-DD.json`.
 
 ## Troubleshooting
 
