@@ -52,12 +52,25 @@ Fill `.env`. Never commit that file.
 
 ## Usage
 
-Spot prices first, then options (options scripts read `data/nifty_spot_prices.json`):
+Run the scripts in this order. Options downloads need the spot file from step 1. Intraday is optional and does not wait on options.
+
+```mermaid
+flowchart TD
+    env["Copy env.example to .env and fill credentials"] --> spot["1. python download_nifty_spot_dhan.py"]
+    spot --> spotFile["Writes data/nifty_spot_prices.json"]
+    spotFile --> which{"Options expiry?"}
+    which -->|Nearest expiry each day| monthly["2. python download_nifty_options_monthly.py"]
+    which -->|One expiry from M_EXPIRY_DATE| manual["2. python download_nifty_options_manual.py"]
+    monthly --> optionsOut["Writes data/options/nifty_options_YYYY-MM-DD.json"]
+    manual --> optionsOut
+    env --> intra["Optional: python download_nifty_intraday_dhan.py"]
+    intra --> intraOut["Writes data/nifty_intraday_price.json"]
+```
 
 ```bash
 python download_nifty_spot_dhan.py
 python download_nifty_options_monthly.py
-python download_nifty_options_manual.py
+# or: python download_nifty_options_manual.py
 python download_nifty_intraday_dhan.py
 ```
 
